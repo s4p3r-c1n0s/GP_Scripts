@@ -1,0 +1,4 @@
+#!/bin/bash
+rm -vf `find /media/BLACKBERRY/ -name BBThumb*`
+umount -v /media/BLACKBERRY
+
