@@ -1,0 +1,33 @@
+#!/bin/bash
+#SCRIPT FOR REVERSE USB TETHERING A ROOTED ANDROID
+#NOTE : THIS SCRIPT IS TO BE RUN ON YOUR COMPUTER WHICH IS PROVIDING INTERNET
+#USB-TETHERING mode should be ON on the Android Device
+#Before running this script; RUN rvrs.sh on the device using Terminal Emulator
+a="$(grep -e 'net.ipv4.*ip_forward.* *= *[1] *' < /etc/sysctl.conf)"
+b="$(grep -e 'net.ipv4.*forwarding.* *= *[1] *' < /etc/sysctl.conf)"
+if [[ -z "$a" || -z "$b" ]]
+    then   
+    if [[ -z "$b" ]]
+        then
+        b="net.ipv4.conf.default.forwarding = 1"
+    fi
+    if [[ -z "$a" ]]
+        then
+        a="net.ipv4.ip_forward = 1"
+    fi
+    sed -e '/net.ipv4.*forward.*/d' -e "/forwarding/{G;s/$/$a/;G;s/$/$b/;}" < /etc/sysctl.conf > /etc/sysctl.confg
+    mv /etc/sysctl.confg /etc/sysctl.conf
+    echo "<<<< /etc/sysctl.conf APPENDED >>>>"
+    ifconfig usb0 192.168.42.130
+    service network restart
+fi 
+echo "<<<< Forwarding Enabled >>>>"
+service iptables stop
+iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE 
+echo "<<<< Setting up NAT >>>>"
+service iptables restart
+#This does not flushes the NAT iptable 
+iptables -F
+echo "<<<< Flushing IPTABLES >>>>"
+#Address given to the Android device is 192.168.42.132
+ping -c 5 192.168.42.132
