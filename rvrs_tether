@@ -18,8 +18,8 @@ if [[ -z "$a" || -z "$b" ]]
     sed -e '/net.ipv4.*forward.*/d' -e "/forwarding/{G;s/$/$a/;G;s/$/$b/;}" < /etc/sysctl.conf > /etc/sysctl.confg
     mv /etc/sysctl.confg /etc/sysctl.conf
     echo "<<<< /etc/sysctl.conf APPENDED >>>>"
-    ifconfig usb0 192.168.42.130
     service network restart
+    ifconfig usb0 192.168.42.130
 fi 
 echo "<<<< Forwarding Enabled >>>>"
 service iptables stop
